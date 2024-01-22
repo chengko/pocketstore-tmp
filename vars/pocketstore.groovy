@@ -23,7 +23,7 @@ def configure(String projectName, String buildSetting, String privateSite) {
                     }
                     """
                     
-                    writeFile file: BUILD_SETTINGS, text: content\
+                    writeFile file: BUILD_SETTINGS, text: content
                 }
             }
         }
