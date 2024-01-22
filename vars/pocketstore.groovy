@@ -12,11 +12,18 @@ def configure(String projectName, String buildSetting, String privateSite) {
                     def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/$projectName").toString().trim()
                     
                     BUILD_SETTINGS = "${destDir}/${privateSite}.json"
-                    
+
                     sh "mkdir -p ${destDir}"
-                    configFileProvider([configFile(fileId: "pocketstore-webconfig-${privateSite}", targetLocation: 'webconfig.json', variable: 'webconfigFile')]) {
-                        sh "cp webconfig.json ${BUILD_SETTINGS}"
-                    }    
+
+                    def content = """
+                    {
+                      "SkipWebConfig": false,
+                      "WebConfigIndexFileUrl": "http://dev.make-wish.club/pocketstore-web-config/${privateSite}/IndexFile.json",
+                      "LocalSite": "Private_${privateSite}"
+                    }
+                    """
+                    
+                    writeFile file: BUILD_SETTINGS, text: content\
                 }
             }
         }
