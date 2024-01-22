@@ -2,7 +2,7 @@ def configureBuild(String projectName, String buildSetting, String privateSite) 
 
     node('unityci') {
         def result = [
-            File: "BatchBuildSettings/WebConfig/WebConfig.${buildSetting}.json"
+            File: "BatchBuildSettings/WebConfig/WebConfig.${buildSetting}.json",
             Site: buildSetting
         ]
         if (buildSetting == '(Private)') {
