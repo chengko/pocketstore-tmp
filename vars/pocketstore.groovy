@@ -5,7 +5,7 @@ def configureBuild(String projectName, String buildSetting, String privateSite) 
             
 
             echo BUILD_SETTINGS
-            
+
             def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/$projectName").toString().trim()
             
             BUILD_SETTINGS = "${destDir}/${privateSite}.json"
@@ -26,5 +26,7 @@ def configureBuild(String projectName, String buildSetting, String privateSite) 
             
             writeFile file: BUILD_SETTINGS, text: BUILD_SETTINGS_CONTENT
         }
+
+        return BUILD_SETTINGS
     }
 }
