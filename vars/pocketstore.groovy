@@ -1,7 +1,10 @@
 def configureBuild(String projectName, String buildSetting, String privateSite) {
-    
+
     node('unityci') {
         if (buildSetting == '(Private)') {
+            
+
+            echo BUILD_SETTINGS
             
             def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/$projectName").toString().trim()
             
@@ -13,7 +16,7 @@ def configureBuild(String projectName, String buildSetting, String privateSite) 
 
             echo BUILD_SETTINGS
 
-            def content = """
+            def BUILD_SETTINGS_CONTENT = """
             {
                 "SkipWebConfig": false,
                 "WebConfigIndexFileUrl": "http://dev.make-wish.club/pocketstore-web-config/${privateSite}/IndexFile.json",
@@ -21,7 +24,7 @@ def configureBuild(String projectName, String buildSetting, String privateSite) 
             }
             """
             
-            writeFile file: BUILD_SETTINGS, text: content
+            writeFile file: BUILD_SETTINGS, text: BUILD_SETTINGS_CONTENT
         }
     }
 }
