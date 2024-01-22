@@ -14,6 +14,10 @@ def configure(String projectName, String buildSetting, String privateSite) {
 
                 sh "mkdir -p ${destDir}"
 
+                echo destDir
+
+                echo BUILD_SETTINGS
+
                 def content = """
                 {
                     "SkipWebConfig": false,
