@@ -17,7 +17,7 @@ def configureSite(buildSetting, privateSite) {
             copyArtifacts parameters: "Name=${privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
             def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
             writeIndexFile(privateSite)
-            writeSite(privateSite, '130.211.246.195:8590', gameCode)
+            writeSite(privateSite, '130.211.246.195:8590', gameCode + 1)
         }
     }
 
@@ -40,6 +40,7 @@ def writeWebConfig(destDir, site) {
 }
 
 def writeIndexFile(site) {
+    echo "writeIndexFile"
     def content = """
     {
         "BaseUrl": "http://dev.make-wish.club/pocketstore-web-config/",
@@ -54,7 +55,8 @@ def writeIndexFile(site) {
     writeToWeb(site, "IndexFile.json", content)
 }
 
-def writeSite(site, gateway, gameCode) {
+def writeSite(site, gateway, serverId) {
+    echo "writeSite"
     def content = """
     {
         "BundleUrl": "http://13.114.245.218:17080/PS/bundles/GamaniaAWSDaily",
@@ -62,7 +64,7 @@ def writeSite(site, gateway, gameCode) {
             "${gateway}"
         ],
         "LoginServiceIds": [
-            ${gameCode + 1}
+            ${serverId}
         ],
         "RemoteLogConfig": {
             "URL": "",
@@ -76,6 +78,7 @@ def writeSite(site, gateway, gameCode) {
 }
 
 def writeToWeb(site, filename, content) {
+    echo "writeToWeb"
     writeFile file: filename, text: content
 
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
