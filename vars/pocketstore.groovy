@@ -79,7 +79,7 @@ def writeSite(site, gateway, serverId) {
 
 def writeToWeb(site, filename, content) {
 
-    sh "echo '${content}' > ${filename}"
+    sh "echo -e '${content}' > ${filename}"
     //writeFile file: filename, text: content
 
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
