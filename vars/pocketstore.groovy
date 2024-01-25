@@ -79,11 +79,11 @@ def writeSite(site, gateway, serverId) {
 
 def writeToWeb(site, filename, content) {
 
-    sh "echo -e '${content}' > ${filename}"
-    //writeFile file: filename, text: content
+    //sh "echo -e '${content}' > ${filename}"
+    writeFile file: filename, text: content
 
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
 
-    sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site"
+    sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site'"
     sh "docker cp ${file} hfs:$WEB_CONFIG_ROOT/$site/"
 }
