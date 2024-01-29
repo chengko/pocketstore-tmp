@@ -41,6 +41,16 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
             driver: bridge
     services:
     """
+
+    def dockerCompose = [
+        version: '3',
+        network: [
+            csp-network: [
+                driver: 'bridge'
+            ]
+        ],
+        services: []
+    ]
     
     services.each { service ->
         echo "Processing service: $service"
@@ -63,23 +73,24 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
                 networks:
                 - csp-network
         """
+        dockerCompose.serivces[serviceName] = [
+            image: 'mcr.microsoft.com/dotnet/runtime:6.0',
+            command: "/app/Deployment/DeployUpdate/bin/${binName}/${binName}",
+            working_dir: "/app/${instanceRoot}/${serviceName}",
+            ports: ["${port}:${port}"],
+            volumes: ['./Deployment:/app/Deployment'],
+            networks: ['csp-network']
+        ]
     }
-    
+    /*
     def yaml = new org.yaml.snakeyaml.Yaml()
     def data = yaml.load(dockerComposeContent)
     def yamlStr = "${yaml.dump(data)}"
     println yamlStr
 
-    
-    //writeYaml file: 'docker-compose.yml', data: data
-    //writeFile file: "docker-compose.yml", text: yamlStr
-    sh "rm -rf docker-compose.yml"
-    sh "touch docker-compose.yml"
-    new File('docker-compose.yml').withWriter { writer ->
-        //writer.write(yamlStr)
-        yaml.write(writer, data)
-    }
-
+    */
+    echo "${dockerCompose}"
+    writeYaml file: 'docker-compose.yml', data: dockerCompose
 
 }
 
