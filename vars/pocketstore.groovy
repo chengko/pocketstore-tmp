@@ -1,6 +1,7 @@
 import com.makewish.pocketstore.ConfigureSiteArgs
 
 def configureSite(args) {
+    
     def siteArgs = new ConfigureSiteArgs(args)
 
     def result = [
@@ -23,7 +24,7 @@ def configureSite(args) {
 
         
         writeIndexFile(siteArgs.privateSite)
-        writeSite(siteArgs.privateSite, siteArgs.gatewayAddress, gameCode + 1)
+        writeSite(siteArgs, gameCode + 1)
     }
 
     return result
@@ -45,7 +46,7 @@ def writeWebConfig(destDir, site) {
 }
 
 def writeIndexFile(site) {
-    echo "writeIndexFile"
+
     def content = """
     {
         "BaseUrl": "http://dev.make-wish.club/pocketstore-web-config/",
@@ -60,13 +61,13 @@ def writeIndexFile(site) {
     writeToWeb(site, "IndexFile.json", content)
 }
 
-def writeSite(site, gateway, serverId) {
-    echo "writeSite"
+def writeSite(siteArgs, serverId) {
+
     def content = """
     {
-        "BundleUrl": "http://13.114.245.218:17080/PS/bundles/GamaniaAWSDaily",
+        "BundleUrl": "${siteArgs.bundleUrl}",
         "GatewayAddress": [
-            "${gateway}"
+            "${siteArgs.gateway}"
         ],
         "LoginServiceIds": [
             ${serverId}
@@ -79,12 +80,10 @@ def writeSite(site, gateway, serverId) {
     }
     """
 
-    writeToWeb(site, "Site.json", content)
+    writeToWeb(siteArgs.privateSite, "Site.json", content)
 }
 
 def writeToWeb(site, filename, content) {
-
-    //sh "echo -e '${content}' > ${filename}"
     writeFile file: filename, text: content
 
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
