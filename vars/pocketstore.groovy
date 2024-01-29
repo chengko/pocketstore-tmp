@@ -33,11 +33,14 @@ def selectSite(buildSetting, privateSite) {
 
 def buildDockerCompose(instanceRoot, gameCode, services) {
 
-    def dockerComposeContent = libraryResource 'template/docker-compose-part1.tp'
-
-    echo dockerComposeContent > 'docker-compose.yml'
-
-    def segment = libraryResource 'template/docker-compose-part2.tp'
+    def dockerComposeContent = 
+    """
+    version: '3'
+    networks:
+        csp-network:
+        driver: bridge
+    services:
+    """
     
     services.each { service ->
         echo "Processing service: $service"
@@ -45,14 +48,27 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
         def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
         def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
         
-        echo segment
-            .replaceAll('\\$\\{INSTANCE_ROOT\\}', instanceRoot)
-            .replaceAll('\\$\\{PORT\\}', port.toString())
-            .replaceAll('\\$\\{SERVICE_NAME\\}', serviceName)
-            .replaceAll('\\$\\{BIN_NAME\\}', binName) >> 'docker-compose.yml'
+        dockerComposeContent += 
+        """
+            ${serviceName}:
+                image: mcr.microsoft.com/dotnet/runtime:6.0
+                command: /app/Deployment/DeployUpdate/bin/${binName}/${binName}
+                working_dir: /app/${instanceRoot}/${serviceName}
+                environment:
+                - SOME_ENV_VARIABLE=${serviceName}
+                ports:
+                - ${port}:${port}
+                volumes:
+                - ./Deployment:/app/Deployment
+                networks:
+                - csp-network
+        """
     }
     
-    //def dockerComposeFile = writeFile file: "docker-compose.yml", text: dockerComposeContent
+    def yaml = new org.yaml.snakeyaml.Yaml()
+    def data = yaml.load(dockerComposeContent)
+
+    writeFile file: "docker-compose.yml", text: yaml.dump(data)
 }
 
 def configureSite(args) {
