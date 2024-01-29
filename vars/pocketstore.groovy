@@ -38,7 +38,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     version: '3'
     networks:
         csp-network:
-        driver: bridge
+            driver: bridge
     services:
     """
     
@@ -55,7 +55,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
                 command: /app/Deployment/DeployUpdate/bin/${binName}/${binName}
                 working_dir: /app/${instanceRoot}/${serviceName}
                 environment:
-                - SOME_ENV_VARIABLE=${serviceName}
+                - SOME_ENV_VARIABLE: ${serviceName}
                 ports:
                 - ${port}:${port}
                 volumes:
@@ -68,9 +68,9 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     def yaml = new org.yaml.snakeyaml.Yaml()
     def data = yaml.load(dockerComposeContent)
     def yamlStr = yaml.dump(data)
-    printf yamlStr
-
-    writeFile file: "docker-compose.yml", text: yamlStr
+    printf yamlStr > 'docker-compose.yml'
+    
+    //writeFile file: "docker-compose.yml", text: yamlStr
 }
 
 def configureSite(args) {
