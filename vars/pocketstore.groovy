@@ -1,3 +1,5 @@
+import com.makewish.pocketstore.ConfigureSiteArgs
+
 def configureSite(args) {
     def siteArgs = new ConfigureSiteArgs(args)
 
