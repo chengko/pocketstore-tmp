@@ -49,7 +49,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
                 driver: 'bridge'
             ]
         ],
-        services: []
+        services: [:]
     ]
     
     services.each { service ->
