@@ -39,7 +39,7 @@ def configureSite(args) {
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
     
-    writeIndexFile(siteArgs.site)
+    writeIndexFile(siteArgs)
     writeSite(siteArgs, gameCode + 1)
 }
 
