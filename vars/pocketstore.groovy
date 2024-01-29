@@ -5,7 +5,7 @@ def configureSite(buildSetting, privateSite) {
         Site: buildSetting
     ]
     if (buildSetting == '(Private)') {
-        
+        def gameCode = 0
         node('unityci') {
             def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/pocketstore").toString().trim()
             
@@ -13,10 +13,12 @@ def configureSite(buildSetting, privateSite) {
             result.Site = privateSite
 
             writeWebConfig(destDir, privateSite)
+
+            copyArtifacts parameters: "Name=${privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+            gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
         }
 
-        copyArtifacts parameters: "Name=${privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
-        def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
+        
         writeIndexFile(privateSite)
         writeSite(privateSite, '130.211.246.195:8590', gameCode + 1)
     }
@@ -85,5 +87,5 @@ def writeToWeb(site, filename, content) {
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
 
     sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site'"
-    sh "docker cp ${file} hfs:$WEB_CONFIG_ROOT/$site/"
+    sh "docker cp ${filename} hfs:$WEB_CONFIG_ROOT/$site/"
 }
