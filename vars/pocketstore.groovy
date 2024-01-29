@@ -70,24 +70,25 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     def yamlStr = "${yaml.dump(data)}"
     println yamlStr
 
-    // Create a StringWriter to capture output
-    def stringWriter = new StringWriter()
+    // Define a StringWriter to capture printed output
+    def sw = new StringWriter()
 
-    // Create a PrintWriter using the StringWriter
-    def printWriter = new PrintWriter(stringWriter)
+    // Redirect System.out to the StringWriter
+    System.setOut(new PrintWriter(sw))
 
-    // Redirect println to the PrintWriter
-    System.out.withPrintWriter(printWriter) {
-        // Use println to print to the PrintWriter
-        println yamlStr
-    }
+    // Perform println statements
+    println yamlStr
 
-    // Get the captured output as a string
-    def capturedOutput = stringWriter.toString()
+    // Restore the original System.out
+    System.setOut(System.out)
+
+    // Get the printed output from the StringWriter
+    def printedOutput = sw.toString()
 
     // Print the captured output
-    echo "Captured Output: ${capturedOutput}"
-    writeFile file: "docker-compose.yml", text: capturedOutput
+    println("Captured Output:")
+    println(printedOutput)
+    writeFile file: "docker-compose.yml", text: printedOutput
     
     //writeYaml file: 'docker-compose.yml', data: data
     //writeFile file: "docker-compose.yml", text: yamlStr
