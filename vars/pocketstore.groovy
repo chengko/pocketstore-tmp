@@ -2,26 +2,26 @@ def configureSite(args) {
     def siteArgs = new ConfigureSiteArgs(args)
 
     def result = [
-        File: "BatchBuildSettings/WebConfig/WebConfig.${buildSetting}.json",
-        Site: buildSetting
+        File: "BatchBuildSettings/WebConfig/WebConfig.${siteArgs.buildSetting}.json",
+        Site: siteArgs.buildSetting
     ]
-    if (buildSetting == '(Private)') {
+    if (siteArgs.buildSetting == '(Private)') {
         
         node('unityci') {
             def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/pocketstore").toString().trim()
             
-            result.File = "${destDir}/${privateSite}.json"
-            result.Site = privateSite
+            result.File = "${destDir}/${siteArgs.privateSite}.json"
+            result.Site = siteArgs.privateSite
 
-            writeWebConfig(destDir, privateSite)
+            writeWebConfig(destDir, siteArgs.privateSite)
         }
 
-        copyArtifacts parameters: "Name=${privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+        copyArtifacts parameters: "Name=${siteArgs.privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
         def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
         
-        writeIndexFile(privateSite)
-        writeSite(privateSite, siteArgs.gatewayAddress, gameCode + 1)
+        writeIndexFile(siteArgs.privateSite)
+        writeSite(siteArgs.privateSite, siteArgs.gatewayAddress, gameCode + 1)
     }
 
     return result
