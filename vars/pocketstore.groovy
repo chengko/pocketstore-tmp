@@ -67,8 +67,10 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     
     def yaml = new org.yaml.snakeyaml.Yaml()
     def data = yaml.load(dockerComposeContent)
+    def yamlStr = yaml.dump(data)
+    printf yamlStr
 
-    writeFile file: "docker-compose.yml", text: yaml.dump(data)
+    writeFile file: "docker-compose.yml", text: yamlStr
 }
 
 def configureSite(args) {
