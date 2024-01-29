@@ -35,6 +35,8 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
 
     def dockerComposeContent = libraryResource 'template/docker-compose-part1.tp'
 
+    echo dockerComposeContent > 'docker-compose.yml'
+
     def segment = libraryResource 'template/docker-compose-part2.tp'
     
     services.each { service ->
@@ -43,16 +45,14 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
         def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
         def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
         
-        dockerComposeContent += '\n'
-
-        dockerComposeContent += segment
+        echo segment
             .replaceAll('\\$\\{INSTANCE_ROOT\\}', instanceRoot)
             .replaceAll('\\$\\{PORT\\}', port.toString())
             .replaceAll('\\$\\{SERVICE_NAME\\}', serviceName)
-            .replaceAll('\\$\\{BIN_NAME\\}', binName)
+            .replaceAll('\\$\\{BIN_NAME\\}', binName) >> 'docker-compose.yml'
     }
     
-    def dockerComposeFile = writeFile file: "docker-compose.yml", text: dockerComposeContent
+    //def dockerComposeFile = writeFile file: "docker-compose.yml", text: dockerComposeContent
 }
 
 def configureSite(args) {
