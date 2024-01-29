@@ -69,11 +69,11 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     def data = yaml.load(dockerComposeContent)
     def yamlStr = "${yaml.dump(data)}"
     println yamlStr
-    writeYaml file 'docker-compose.yml', data: data
+    writeYaml file: 'docker-compose.yml', data: data
     //writeFile file: "docker-compose.yml", text: yamlStr
-    //new File('docker-compose.yml').withWriter { writer ->
-    //    writer.write(yamlStr)
-    //}
+    new File('docker-compose2.yml').withWriter { writer ->
+        writer.write(yamlStr)
+    }
 }
 
 def configureSite(args) {
