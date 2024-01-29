@@ -35,11 +35,11 @@ def configureSite(args) {
 
     def siteArgs = new ConfigureSiteArgs(args)
 
-    copyArtifacts parameters: "Name=${siteArgs.privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    copyArtifacts parameters: "Name=${siteArgs.site}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
     
-    writeIndexFile(siteArgs.privateSite)
+    writeIndexFile(siteArgs.site)
     writeSite(siteArgs, gameCode + 1)
 }
 
