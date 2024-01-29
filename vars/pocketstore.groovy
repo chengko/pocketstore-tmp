@@ -31,7 +31,7 @@ def selectSite(buildSetting, privateSite) {
     return result
 }
 
-def buildDockerCompose(services) {
+def buildDockerCompose(instanceRoot, gameCode, services) {
 
     def dockerComposeContent = 
     """\
