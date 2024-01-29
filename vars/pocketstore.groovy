@@ -47,7 +47,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
 
         dockerComposeContent += segment
             .replaceAll('\\$\\{INSTANCE_ROOT\\}', instanceRoot)
-            .replaceAll('\\$\\{PORT\\}', port)
+            .replaceAll('\\$\\{PORT\\}', port.toString())
             .replaceAll('\\$\\{SERVICE_NAME\\}', serviceName)
             .replaceAll('\\$\\{BIN_NAME\\}', binName)
     }
