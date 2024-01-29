@@ -1,7 +1,7 @@
 import com.makewish.pocketstore.ConfigureSiteArgs
 
 def configureSite(args) {
-    
+
     def siteArgs = new ConfigureSiteArgs(args)
 
     def result = [
@@ -67,7 +67,7 @@ def writeSite(siteArgs, serverId) {
     {
         "BundleUrl": "${siteArgs.bundleUrl}",
         "GatewayAddress": [
-            "${siteArgs.gateway}"
+            "${siteArgs.gatewayAddress}"
         ],
         "LoginServiceIds": [
             ${serverId}
