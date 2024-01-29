@@ -92,6 +92,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     */
     echo "${dockerCompose}"
     writeYaml file: 'docker-compose.yml', data: dockerCompose
+    writeYaml file: 'docker-compose1.yml', text: dockerComposeContent
 
 }
 
