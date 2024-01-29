@@ -1,6 +1,6 @@
 import com.makewish.pocketstore.ConfigureSiteArgs
 
-def selectEnv(buildSetting, privateSite) {
+def selectSite(buildSetting, privateSite) {
     def result = [
         File: "BatchBuildSettings/WebConfig/WebConfig.${buildSetting}.json",
         Site: buildSetting
