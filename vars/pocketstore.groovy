@@ -45,7 +45,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     def dockerCompose = [
         version: '3',
         network: [
-            csp-network: [
+            'csp-network': [
                 driver: 'bridge'
             ]
         ],
