@@ -73,9 +73,10 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     
     //writeYaml file: 'docker-compose.yml', data: data
     //writeFile file: "docker-compose.yml", text: yamlStr
+    sh "rm -rf docker-compose.yml"
     sh "touch docker-compose.yml"
     new File('docker-compose.yml').withWriter { writer ->
-        writer.write(yamlStr)
+        //writer.write(yamlStr)
         yaml.write(writer, data)
     }
 
