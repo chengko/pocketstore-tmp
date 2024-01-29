@@ -31,6 +31,43 @@ def selectSite(buildSetting, privateSite) {
     return result
 }
 
+def buildDockerCompose(services) {
+
+    def dockerComposeContent = 
+    """\
+    version: '3'
+    networks:
+        csp-network:
+        driver: bridge
+    services:
+    """
+    
+    services.each { service ->
+        echo "Processing service: $service"
+        def serviceName = service.tokenize('/').last()
+        def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
+        def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
+        
+        dockerComposeContent += 
+        """\
+        ${serviceName}:
+            image: mcr.microsoft.com/dotnet/runtime:6.0
+            command: /app/Deployment/DeployUpdate/bin/${binName}/${binName}
+            working_dir: /app/${instanceRoot}/${serviceName}
+            environment:
+            - SOME_ENV_VARIABLE=${serviceName}
+            ports:
+            - ${port}:${port}
+            volumes:
+            - ./Deployment:/app/Deployment
+            networks:
+            - csp-network
+        """
+    }
+    
+    def dockerComposeFile = writeFile file: "docker-compose.yml", text: dockerComposeContent
+}
+
 def configureSite(args) {
 
     def siteArgs = new ConfigureSiteArgs(args)
