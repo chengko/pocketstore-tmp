@@ -1,51 +1,49 @@
 import com.makewish.pocketstore.ConfigureSiteArgs
 
-def configureSite(args) {
-
-    def siteArgs = new ConfigureSiteArgs(args)
-
+def selectEnv(buildSetting, privateSite) {
     def result = [
-        File: "BatchBuildSettings/WebConfig/WebConfig.${siteArgs.buildSetting}.json",
-        Site: siteArgs.buildSetting
+        File: "BatchBuildSettings/WebConfig/WebConfig.${buildSetting}.json",
+        Site: buildSetting
     ]
-    if (siteArgs.buildSetting == '(Private)') {
+
+    if (buildSetting == '(Private)') {
         
         node('unityci') {
             def destDir = sh(returnStdout: true, script: "echo ~/Documents/config/pocketstore").toString().trim()
             
-            result.File = "${destDir}/${siteArgs.privateSite}.json"
-            result.Site = siteArgs.privateSite
+            result.File = "${destDir}/${privateSite}.json"
+            result.Site = privateSite
 
-            writeWebConfig(destDir, siteArgs.privateSite)
+            def content = """
+            {
+                "SkipWebConfig": false,
+                "WebConfigIndexFileUrl": "http://dev.make-wish.club/pocketstore_web_config/${site}/IndexFile.json",
+                "LocalSite": "Private_${privateSite}"
+            }
+            """
+
+            sh "mkdir -p ${destDir}"
+
+            writeFile file: "${destDir}/${privateSite}.json", text: content
         }
-
-        copyArtifacts parameters: "Name=${siteArgs.privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
-        def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
-
-        
-        writeIndexFile(siteArgs.privateSite)
-        writeSite(siteArgs, gameCode + 1)
     }
 
     return result
 }
 
-def writeWebConfig(destDir, site) {
+def configureSite(args) {
 
-    def content = """
-    {
-        "SkipWebConfig": false,
-        "WebConfigIndexFileUrl": "http://dev.make-wish.club/pocketstore_web_config/${site}/IndexFile.json",
-        "LocalSite": "Private_${site}"
-    }
-    """
+    def siteArgs = new ConfigureSiteArgs(args)
 
-    sh "mkdir -p ${destDir}"
+    copyArtifacts parameters: "Name=${siteArgs.privateSite}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
-    writeFile file: "${destDir}/${site}.json", text: content
+    
+    writeIndexFile(siteArgs.privateSite)
+    writeSite(siteArgs, gameCode + 1)
 }
 
-def writeIndexFile(site) {
+def writeIndexFile(siteArgs) {
 
     def content = """
     {
@@ -53,12 +51,12 @@ def writeIndexFile(site) {
         "Files": [
             "CommonConfig.json",
             "Announcement.json",
-            "${site}/Site.json"		
+            "${siteArgs.site}/Site.json"		
         ]
     }
     """
 
-    writeToWeb(site, "IndexFile.json", content)
+    writeToWeb(siteArgs.site, "IndexFile.json", content)
 }
 
 def writeSite(siteArgs, serverId) {
@@ -80,7 +78,7 @@ def writeSite(siteArgs, serverId) {
     }
     """
 
-    writeToWeb(siteArgs.privateSite, "Site.json", content)
+    writeToWeb(siteArgs.site, "Site.json", content)
 }
 
 def writeToWeb(site, filename, content) {
@@ -89,5 +87,5 @@ def writeToWeb(site, filename, content) {
     def WEB_CONFIG_ROOT = "/home/ssl-web/pocketstore_web_config"
 
     sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site'"
-    sh "docker cp ${filename} hfs:$WEB_CONFIG_ROOT/$site/"
+    sh "docker cp ${filename} hfs:$WEB_CONFIG_ROOT/$site/."
 }
