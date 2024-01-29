@@ -33,15 +33,6 @@ def selectSite(buildSetting, privateSite) {
 
 def buildDockerCompose(instanceRoot, gameCode, services) {
 
-    def dockerComposeContent = 
-    """
-    version: '3'
-    networks:
-        csp-network:
-            driver: bridge
-    services:
-    """
-
     def dockerCompose = [
         version: '3',
         networks: [
@@ -58,21 +49,6 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
         def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
         def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
         
-        dockerComposeContent += 
-        """
-            ${serviceName}:
-                image: mcr.microsoft.com/dotnet/runtime:6.0
-                command: /app/Deployment/DeployUpdate/bin/${binName}/${binName}
-                working_dir: /app/${instanceRoot}/${serviceName}
-                environment:
-                - SOME_ENV_VARIABLE: ${serviceName}
-                ports:
-                - ${port}:${port}
-                volumes:
-                - ./Deployment:/app/Deployment
-                networks:
-                - csp-network
-        """
         dockerCompose.services[serviceName] =  
         [
             image: 'mcr.microsoft.com/dotnet/runtime:6.0',
@@ -83,16 +59,8 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
             networks: ['csp-network']
         ]
     }
-    /*
-    def yaml = new org.yaml.snakeyaml.Yaml()
-    def data = yaml.load(dockerComposeContent)
-    def yamlStr = "${yaml.dump(data)}"
-    println yamlStr
-
-    */
-    echo "${dockerCompose}"
+    
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
-    writeYaml file: 'docker-compose1.yml', data: dockerComposeContent, overwrite: true
 
 }
 
