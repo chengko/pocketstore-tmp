@@ -73,14 +73,15 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
                 networks:
                 - csp-network
         """
-        dockerCompose.serivces[serviceName] = [
+        dockerCompose.serivces.add(serviceName, 
+        [
             image: 'mcr.microsoft.com/dotnet/runtime:6.0',
             command: "/app/Deployment/DeployUpdate/bin/${binName}/${binName}",
             working_dir: "/app/${instanceRoot}/${serviceName}",
             ports: ["${port}:${port}"],
             volumes: ['./Deployment:/app/Deployment'],
             networks: ['csp-network']
-        ]
+        ])
     }
     /*
     def yaml = new org.yaml.snakeyaml.Yaml()
