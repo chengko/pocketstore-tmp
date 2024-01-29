@@ -73,7 +73,7 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
                 networks:
                 - csp-network
         """
-        dockerCompose.serivces.add(serviceName, 
+        dockerCompose.services.add(serviceName, 
         [
             image: 'mcr.microsoft.com/dotnet/runtime:6.0',
             command: "/app/Deployment/DeployUpdate/bin/${binName}/${binName}",
