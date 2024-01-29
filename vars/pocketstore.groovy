@@ -70,7 +70,10 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
     def yamlStr = "${yaml.dump(data)}"
     println yamlStr
     
-    writeFile file: "docker-compose.yml", text: yamlStr
+    //writeFile file: "docker-compose.yml", text: yamlStr
+    new File('docker-compose.yml').withWriter { writer ->
+        writer.write(yamlStr)
+    }
 }
 
 def configureSite(args) {
