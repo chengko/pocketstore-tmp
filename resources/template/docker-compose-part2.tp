@@ -1,0 +1,13 @@
+    ${SERVICE_NAME}:
+      image: mcr.microsoft.com/dotnet/runtime:6.0
+      command: /app/Deployment/DeployUpdate/bin/${BIN_NAME}/${BIN_NAME}
+      working_dir: /app/${INSTANCE_ROOT}/${SERVICE_NAME}
+      environment:
+      - SOME_ENV_VARIABLE=${SERVICE_NAME}
+      ports:
+      - ${PORT}:${PORT}
+      volumes:
+      - ./Deployment:/app/Deployment
+      networks:
+      - csp-network
+    

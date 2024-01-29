@@ -33,14 +33,9 @@ def selectSite(buildSetting, privateSite) {
 
 def buildDockerCompose(instanceRoot, gameCode, services) {
 
-    def dockerComposeContent = 
-    """\
-    version: '3'
-    networks:
-        csp-network:
-        driver: bridge
-    services:
-    """
+    def dockerComposeContent = libraryResource 'template/docker-compose-part1.tp'
+
+    def segment = libraryResource 'template/docker-compose-part2.tp'
     
     services.each { service ->
         echo "Processing service: $service"
@@ -48,21 +43,13 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
         def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
         def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
         
-        dockerComposeContent += 
-        """\
-        ${serviceName}:
-            image: mcr.microsoft.com/dotnet/runtime:6.0
-            command: /app/Deployment/DeployUpdate/bin/${binName}/${binName}
-            working_dir: /app/${instanceRoot}/${serviceName}
-            environment:
-            - SOME_ENV_VARIABLE=${serviceName}
-            ports:
-            - ${port}:${port}
-            volumes:
-            - ./Deployment:/app/Deployment
-            networks:
-            - csp-network
-        """
+        dockerComposeContent += '\n'
+
+        dockerComposeContent += segment
+            .replaceAll('\\$\\{INSTANCE_ROOT\\}', instanceRoot)
+            .replaceAll('\\$\\{PORT\\}', port)
+            .replaceAll('\\$\\{SERVICE_NAME\\}', serviceName)
+            .replaceAll('\\$\\{BIN_NAME\\}', binName)
     }
     
     def dockerComposeFile = writeFile file: "docker-compose.yml", text: dockerComposeContent
