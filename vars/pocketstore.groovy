@@ -80,7 +80,7 @@ def writeIndexFile(siteArgs) {
 
     def content = """
     {
-        "BaseUrl": "http://dev.make-wish.club/pocketstore-web-config/",
+        "BaseUrl": "http://dev.make-wish.club/pocketstore_web_config/",
         "Files": [
             "CommonConfig.json",
             "Announcement.json",
