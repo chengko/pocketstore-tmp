@@ -31,23 +31,29 @@ def selectSite(buildSetting, privateSite) {
     return result
 }
 
-def buildDockerCompose(globalSettingsPath, gameCode, services, privateSite) {
+def buildDockerCompose(args) {
+
+    def siteArgs = new BuildDockerComposeArgs(args)
 
     def dockerCompose = [
         version: '3',
         networks: [
-            'csp-local': [:]
+            "${siteArgs.network}": [:]
         ],
         services: [:]
     ]
 
-    if(privateSite) {
-        dockerCompose.networks['csp-local']['external'] = true
+    def servicesYml = [
+        Services: [:]
+    ]
+
+    if(siteArgs.isLocal) {
+        dockerCompose.networks[siteArgs.network]['external'] = true
     } else {
-        dockerCompose.networks['csp-local']['driver'] = 'bridge'
+        dockerCompose.networks[siteArgs.network]['driver'] = 'bridge'
     }
     
-    services.each { service ->
+    siteArgs.services.each { service ->
         echo "Processing service: $service"
         def serviceName = service.tokenize('/').last()
         def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
@@ -60,16 +66,29 @@ def buildDockerCompose(globalSettingsPath, gameCode, services, privateSite) {
                 HOSTNAME: serviceName,
                 SERVICE: binName
             ],
-            volumes: ["${globalSettingsPath}:/app/Deployment/DeployCore/Instances/GlobalSettings.json"],
-            networks: ['csp-local']
+            volumes: ["${siteArgs.globalSettingsPath}:/app/Deployment/DeployCore/Instances/GlobalSettings.json"],
+            networks: [ siteArgs.network ]
         ]
 
-        if(!privateSite) {
+
+
+        if(siteArgs.isLocal) {
+            def host = siteArgs.site.toLower() + '-' + serviceName + '-1'
+            servicesYml.Services[port] = [
+                Name: binName,
+                Host: host,
+                Port: port
+            ]
+        } else {
             dockerCompose.services[serviceName]['ports'] = ["${port}:${port}"]
         }
     }
     
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
+
+    if(siteArgs.isLocal) {
+        writeYaml file: 'services.yml', data: servicesYml, overwrite: true
+    }
 
 }
 
