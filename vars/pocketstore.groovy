@@ -61,7 +61,7 @@ def buildDockerCompose(args) {
         
         dockerCompose.services[serviceName] =  
         [
-            image: 'mcr.microsoft.com/dotnet/runtime:6.0',
+            image: "pocketstore:${siteArgs.version}",
             environment: [
                 HOSTNAME: serviceName,
                 SERVICE: binName
@@ -73,6 +73,7 @@ def buildDockerCompose(args) {
 
 
         if(siteArgs.isLocal) {
+            // SITE-SERVICE-1
             def host = siteArgs.site.toLower() + '-' + serviceName + '-1'
             servicesYml.Services[port] = [
                 Name: binName,

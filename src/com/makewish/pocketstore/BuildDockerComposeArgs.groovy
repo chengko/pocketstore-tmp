@@ -9,6 +9,7 @@ class BuildDockerComposeArgs implements Serializable {
     String globalSettingsPath = './GlobalSettings.json'
     String network = 'csp-local'
     String[] services
+    String version = 'snapshot'
     Boolean isLocal
 
     BuildDockerComposeArgs(Map source) {
