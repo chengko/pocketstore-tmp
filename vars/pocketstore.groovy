@@ -56,7 +56,7 @@ def buildDockerCompose(args) {
     siteArgs.services.each { service ->
         echo "Processing service: $service"
         def serviceName = service.tokenize('/').last()
-        def port = gameCode + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
+        def port = siteArgs.gameCode.toInteger() + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
         def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
         
         dockerCompose.services[serviceName] =  
