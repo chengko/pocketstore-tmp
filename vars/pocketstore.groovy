@@ -31,17 +31,21 @@ def selectSite(buildSetting, privateSite) {
     return result
 }
 
-def buildDockerCompose(instanceRoot, gameCode, services) {
+def buildDockerCompose(globalSettingsPath, gameCode, services, privateSite) {
 
     def dockerCompose = [
         version: '3',
         networks: [
-            'csp-network': [
-                driver: 'bridge'
-            ]
+            'csp-local': [:]
         ],
         services: [:]
     ]
+
+    if(privateSite) {
+        dockerCompose.networks['csp-local']['external'] = true
+    } else {
+        dockerCompose.networks['csp-local']['driver'] = 'bridge'
+    }
     
     services.each { service ->
         echo "Processing service: $service"
@@ -52,12 +56,17 @@ def buildDockerCompose(instanceRoot, gameCode, services) {
         dockerCompose.services[serviceName] =  
         [
             image: 'mcr.microsoft.com/dotnet/runtime:6.0',
-            command: "/app/Deployment/DeployUpdate/bin/${binName}/${binName}",
-            working_dir: "/app/${instanceRoot}/${serviceName}",
-            ports: ["${port}:${port}"],
-            volumes: ['./Deployment:/app/Deployment'],
-            networks: ['csp-network']
+            environment: [
+                HOSTNAME: serviceName,
+                SERVICE: binName
+            ],
+            volumes: ["${globalSettingsPath}:/app/Deployment/DeployCore/Instances/GlobalSettings.json"],
+            networks: ['csp-local']
         ]
+
+        if(!privateSite) {
+            dockerCompose.services[serviceName]['ports'] = ["${port}:${port}"]
+        }
     }
     
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
