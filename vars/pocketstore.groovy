@@ -62,8 +62,6 @@ def buildDockerCompose(args) {
     copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
-    sh "mkdir Instances"
-
     for(i = 1; i <=siteArgs.sharding; i++) {
         def serviceName = sprintf('GameService%02d', i)
         siteArgs.services[serviceName] = [
@@ -72,11 +70,13 @@ def buildDockerCompose(args) {
             ServiceIndex: 10+i
         ]
     }
+
+    sh "rm -rf Instances"
     
     siteArgs.services.each { serviceName, service ->
         echo "Processing service: $serviceName"
-        sh "mkdir Instances/${serviceName}"
-        writeJSON file: "$serviceName/LocalSettings.json", json: service, overwrite: true
+        sh "mkdir -p Instances/${serviceName}"
+        writeJSON file: "Instances/$serviceName/LocalSettings.json", json: service
 
         def port = gameCode + service.ServiceIndex
         
@@ -107,10 +107,9 @@ def buildDockerCompose(args) {
         }
     }
     
-    writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
-
+    writeYaml file: 'docker-compose.yml', data: dockerCompose
     if(siteArgs.selfHosting) {
-        writeYaml file: 'services.yml', data: servicesYml, overwrite: true
+        writeYaml file: 'services.yml', data: servicesYml
     }
     
 }
