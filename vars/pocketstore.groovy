@@ -38,15 +38,15 @@ def buildDockerCompose(args) {
 
     def dockerCompose = [
         version: '3',
-        networks: [
-            "${siteArgs.network}": [:]
-        ],
+        networks: [:],
         services: [:]
     ]
 
     def servicesYml = [
         Services: [:]
     ]
+
+    dockerCompose.networks[siteArgs.network] = [:]
 
     if(siteArgs.selfHosting) {
         dockerCompose.networks[siteArgs.network].external = true
