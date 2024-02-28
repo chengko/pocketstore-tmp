@@ -109,7 +109,7 @@ def buildDockerCompose(args) {
     
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
     if(siteArgs.selfHosting) {
-        writeYaml file: 'services.yml', data: servicesYml, overwrite: true
+        writeYaml file: 'services.yml', data: servicesYml
     }
     
 }
