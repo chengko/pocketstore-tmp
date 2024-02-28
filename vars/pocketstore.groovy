@@ -95,13 +95,15 @@ def buildDockerCompose(args) {
         ]
 
         if(siteArgs.selfHosting) {
-            // SITE-SERVICE-1
-            def host = siteArgs.site.toLowerCase() + '-' + serviceName + '-1'
-            servicesYml.Services[port] = [
-                Name: service.Assembly,
-                Host: host,
-                Port: port
-            ]
+            if(service.ServiceType == 'Login' || service.ServiceType == 'Game') {
+                // SITE-SERVICE-1
+                def host = siteArgs.site.toLowerCase() + '-' + serviceName + '-1'
+                servicesYml.Services[port] = [
+                    Name: service.Assembly,
+                    Host: host,
+                    Port: port
+                ]
+            }
         } else {
             dockerCompose.services[serviceName]['ports'] = ["${port}:${port}"]
         }
