@@ -36,8 +36,6 @@ def buildDockerCompose(args) {
 
     def siteArgs = new BuildDockerComposeArgs(args)
 
-    sh "echo ${siteArgs.version}"
-    /*
     def dockerCompose = [
         version: '3',
         networks: [
@@ -114,7 +112,7 @@ def buildDockerCompose(args) {
     if(siteArgs.selfHosting) {
         writeYaml file: 'services.yml', data: servicesYml, overwrite: true
     }
-    */
+    
 }
 
 def configureSite(args) {
