@@ -1,4 +1,4 @@
-// src/com/makewish/pocketstore/UploadArtifactsArgs.groovy
+// src/com/makewish/pocketstore/BuildDockerComposeArgs.groovy
 
 package com.makewish.pocketstore
 
