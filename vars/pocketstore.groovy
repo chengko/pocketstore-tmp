@@ -1,4 +1,5 @@
 import com.makewish.pocketstore.ConfigureSiteArgs
+import com.makewish.pocketstore.BuildDockerComposeArgs
 
 def selectSite(buildSetting, privateSite) {
     def result = [
