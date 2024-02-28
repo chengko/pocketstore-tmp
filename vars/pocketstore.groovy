@@ -96,7 +96,7 @@ def buildDockerCompose(args) {
 
         if(siteArgs.selfHosting) {
             // SITE-SERVICE-1
-            def host = siteArgs.site.toLower() + '-' + serviceName + '-1'
+            def host = siteArgs.site.toLowerCase() + '-' + serviceName + '-1'
             servicesYml.Services[port] = [
                 Name: service.Assembly,
                 Host: host,
