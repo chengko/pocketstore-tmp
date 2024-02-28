@@ -63,7 +63,7 @@ def buildDockerCompose(args) {
 
     sh "mkdir Instances"
 
-    for(i in 1..<=siteArgs.sharding) {
+    for(i = 1; i <=siteArgs.sharding; i++) {
         def serviceName = sprintf('GameService%02d', i)
         siteArgs.services[serviceName] = [
             Assembly: 'GameService',
