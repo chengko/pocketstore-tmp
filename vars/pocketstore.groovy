@@ -47,7 +47,7 @@ def buildDockerCompose(args) {
         Services: [:]
     ]
 
-    if(siteArgs.isLocal) {
+    if(siteArgs.selfHosting) {
         dockerCompose.networks[siteArgs.network]['external'] = true
     } else {
         dockerCompose.networks[siteArgs.network]['driver'] = 'bridge'
@@ -92,8 +92,8 @@ def buildDockerCompose(args) {
             ],
             networks: [ siteArgs.network ]
         ]
-        
-        if(siteArgs.isLocal) {
+
+        if(siteArgs.selfHosting) {
             // SITE-SERVICE-1
             def host = siteArgs.site.toLower() + '-' + serviceName + '-1'
             servicesYml.Services[port] = [

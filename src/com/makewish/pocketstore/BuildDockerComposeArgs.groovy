@@ -9,7 +9,7 @@ class BuildDockerComposeArgs implements Serializable {
     Integer sharding = 1
     String network = 'csp-local'
     String version = 'snapshot'
-    Boolean isLocal
+    Boolean selfHosting
 
     Map services = [
         MasterService:  [
