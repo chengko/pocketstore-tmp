@@ -11,7 +11,7 @@ class BuildDockerComposeArgs implements Serializable {
     String version = 'snapshot'
     Boolean selfHosting
 
-    Map services = [
+    Map<String, Map> services = [
         MasterService:  [
             Assembly: 'MasterService',
             IsMasterService: true,
