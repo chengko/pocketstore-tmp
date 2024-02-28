@@ -1,5 +1,5 @@
-import com.makewish.pocketstore.ConfigureSiteArgs
 import com.makewish.pocketstore.BuildDockerComposeArgs
+import com.makewish.pocketstore.ConfigureSiteArgs
 
 def selectSite(buildSetting, privateSite) {
     def result = [
@@ -109,7 +109,7 @@ def buildDockerCompose(args) {
     
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
 
-    if(siteArgs.isLocal) {
+    if(siteArgs.selfHosting) {
         writeYaml file: 'services.yml', data: servicesYml, overwrite: true
     }
 
