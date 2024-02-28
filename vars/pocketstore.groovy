@@ -71,7 +71,7 @@ def buildDockerCompose(args) {
         ]
     }
 
-    sh "rm -rf Instances"
+    sh "rm -rf Instances services.yml"
     
     siteArgs.services.each { serviceName, service ->
         echo "Processing service: $serviceName"
