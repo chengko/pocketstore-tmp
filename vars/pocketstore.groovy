@@ -36,6 +36,8 @@ def buildDockerCompose(args) {
 
     def siteArgs = new BuildDockerComposeArgs(args)
 
+    sh "echo ${siteArgs.version}"
+    /*
     def dockerCompose = [
         version: '3',
         networks: [
@@ -49,9 +51,9 @@ def buildDockerCompose(args) {
     ]
 
     if(siteArgs.selfHosting) {
-        dockerCompose.networks[siteArgs.network]['external'] = true
+        dockerCompose.networks[siteArgs.network].external = true
     } else {
-        dockerCompose.networks[siteArgs.network]['driver'] = 'bridge'
+        dockerCompose.networks[siteArgs.network].driver = 'bridge'
     }
 
     def globalSettings = siteArgs.site
@@ -112,7 +114,7 @@ def buildDockerCompose(args) {
     if(siteArgs.selfHosting) {
         writeYaml file: 'services.yml', data: servicesYml, overwrite: true
     }
-
+    */
 }
 
 def configureSite(args) {
