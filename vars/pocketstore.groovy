@@ -52,31 +52,52 @@ def buildDockerCompose(args) {
     } else {
         dockerCompose.networks[siteArgs.network]['driver'] = 'bridge'
     }
+
+    def globalSettings = siteArgs.site
+    if(siteArgs.template != '') {
+        globalSettings = siteArgs.template
+    }
+
+    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
+
+    sh "mkdir Instances"
+
+    for(i in 1..<=siteArgs.sharding) {
+        def serviceName = sprintf('GameService%02d', i)
+        siteArgs.services[serviceName] = [
+            Assembly: 'GameService',
+            ServiceType: 'Game',
+            ServiceIndex: 10+i
+        ]
+    }
     
-    siteArgs.services.each { service ->
-        echo "Processing service: $service"
-        def serviceName = service.tokenize('/').last()
-        def port = siteArgs.gameCode.toInteger() + sh(script: "jq -r '.ServiceIndex' ${service}/LocalSettings.json", returnStdout:true).trim().toInteger()
-        def binName = sh(script: "jq -r '.Assembly' ${service}/LocalSettings.json", returnStdout:true).trim()
+    siteArgs.services.each { serviceName, service ->
+        echo "Processing service: $serviceName"
+        sh "mkdir Instances/${serviceName}"
+        writeJSON file: "$serviceName/LocalSettings.json", json: service, overwrite: true
+
+        def port = gameCode + service.ServiceIndex
         
         dockerCompose.services[serviceName] =  
         [
             image: "pocketstore:${siteArgs.version}",
             environment: [
                 HOSTNAME: serviceName,
-                SERVICE: binName
+                SERVICE: service.Assembly
             ],
-            volumes: ["${siteArgs.globalSettingsPath}:/app/Deployment/DeployCore/Instances/GlobalSettings.json"],
+            volumes: [
+                "./GlobalSettings.json:/app/Deployment/DeployCore/Instances/GlobalSettings.json",
+                "./Instances/${serviceName}:/app/Deployment/DeployCore/Instances/${serviceName}"
+            ],
             networks: [ siteArgs.network ]
         ]
-
-
-
+        
         if(siteArgs.isLocal) {
             // SITE-SERVICE-1
             def host = siteArgs.site.toLower() + '-' + serviceName + '-1'
             servicesYml.Services[port] = [
-                Name: binName,
+                Name: service.Assembly,
                 Host: host,
                 Port: port
             ]
