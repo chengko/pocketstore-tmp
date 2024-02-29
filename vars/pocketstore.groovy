@@ -127,7 +127,9 @@ def configureSite(args) {
     writeIndexFile(siteArgs)
     writeSite(siteArgs, gameCode + 1)
 
-    currentBuild.description = "http://dev.make-wish.club/pocketstore_web_config/${siteArgs.site}/IndexFile.json"
+    def url = "http://dev.make-wish.club/pocketstore_web_config/${siteArgs.site}/IndexFile.json"
+
+    currentBuild.description = "<a href='${url}'>${url}</a>"
 }
 
 def writeIndexFile(siteArgs) {
