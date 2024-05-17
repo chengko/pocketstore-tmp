@@ -116,6 +116,66 @@ def buildDockerCompose(args) {
     
 }
 
+def buildHttpDockerCompose(args) {
+
+    def siteArgs = new BuildDockerComposeArgs(args)
+
+    def dockerCompose = [
+        version: '3',
+        networks: [:],
+        services: [:]
+    ]
+
+    dockerCompose.networks[siteArgs.network] = [:]
+    dockerCompose.networks[siteArgs.network].driver = 'bridge'
+    dockerCompose.networks['csp'] = [:]
+    dockerCompose.networks['csp'].external = true
+
+    def globalSettings = siteArgs.site
+    if(siteArgs.template != '') {
+        globalSettings = siteArgs.template
+    }
+
+    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
+
+    for(i = 1; i <=siteArgs.sharding; i++) {
+        def serviceName = sprintf('GameService%02d', i)
+        siteArgs.services[serviceName] = [
+            Assembly: 'GameService',
+            ServiceType: 'Game',
+            ServiceIndex: 10+i
+        ]
+    }
+
+    sh "rm -rf Instances services.yml"
+    
+    siteArgs.services.each { serviceName, service ->
+        echo "Processing service: $serviceName"
+        sh "mkdir -p Instances/${serviceName}"
+        writeJSON file: "Instances/$serviceName/LocalSettings.json", json: service
+
+        def port = gameCode + service.ServiceIndex
+        
+        dockerCompose.services[serviceName] =  
+        [
+            image: "pocketstore:${siteArgs.version}",
+            environment: [
+                HOSTNAME: serviceName,
+                SERVICE: service.Assembly
+            ],
+            volumes: [
+                "./GlobalSettings.json:/app/Deployment/DeployCore/Instances/GlobalSettings.json",
+                "./Instances/${serviceName}:/app/Deployment/DeployCore/Instances/${serviceName}"
+            ],
+            networks: [ siteArgs.network, 'csp' ]
+        ]
+    }
+    
+    writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
+    
+}
+
 def configureSite(args) {
 
     def siteArgs = new ConfigureSiteArgs(args)
