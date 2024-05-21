@@ -245,18 +245,18 @@ def writeNginxConfig(siteArgs, gameCode) {
 
     def env = siteArgs.site.toLowerCase()
 
-    def content = """
+    def content = '''
     server {
         listen 80;
         server_name _;
 
         resolver 127.0.0.11 valid=30s;
 
-        location /${env} {
-            rewrite ^/${env}(/.*)$ \$1 break;
+        location /''' + env + ''' {
+            rewrite ^/''' + env + '''(/.*)$ $1 break;
 
-            map \$http_x_target \$upstream_backend {
-    """
+            map $http_x_target $upstream_backend {
+    '''
 
     siteArgs.services.each { serviceName, service ->
         def port = gameCode + service.ServiceIndex
