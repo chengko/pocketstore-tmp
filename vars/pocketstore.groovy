@@ -203,7 +203,7 @@ def writeIndexFile(siteArgs) {
             "${siteArgs.site}/Site.json"		
         ]
     }
-    """
+    """.stripIndent()
 
     writeToWeb(siteArgs.site, "IndexFile.json", content)
 }
@@ -225,7 +225,7 @@ def writeSite(siteArgs, serverId) {
             "LogPerformaceInterval": 60.0
         }
     }
-    """
+    """.stripIndent()
 
     writeToWeb(siteArgs.site, "Site.json", content)
 }
