@@ -246,18 +246,8 @@ def writeToWeb(site, filename, content) {
 def writeNginxConfig(siteArgs, gameCode) {
 
     def env = siteArgs.site.toLowerCase()
-
     def content = '''
-    server {
-        listen 80;
-        server_name _;
-
-        resolver 127.0.0.11 valid=30s;
-
-        location /''' + env + ''' {
-            rewrite ^/''' + env + '''(/.*)$ $1 break;
-
-            map $http_x_target $upstream_backend {
+    map $http_x_target $upstream_backend {
     '''
 
     siteArgs.services.each { serviceName, service ->
@@ -269,9 +259,17 @@ def writeNginxConfig(siteArgs, gameCode) {
         }
     }
 
-    content += """
-                default "";
-            }
+    content += '''
+    }
+
+    server {
+        listen 80;
+        server_name _;
+
+        resolver 127.0.0.11 valid=30s;
+
+        location /''' + env + ''' {
+            rewrite ^/''' + env + '''(/.*)$ $1 break;
 
             if (\$upstream_backend = "") {
                 return 404;
@@ -284,7 +282,7 @@ def writeNginxConfig(siteArgs, gameCode) {
             proxy_set_header X-Forwarded-Proto \$scheme;
         }
     }
-    """
+    '''
 
     content = content.stripIndent()
 
