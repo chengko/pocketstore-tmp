@@ -212,11 +212,13 @@ def writeIndexFile(siteArgs) {
 
 def writeSite(siteArgs, serverId) {
 
+    def gatewayAddress = siteArgs.gatewayAddress.replace("{site}", siteArgs.site)
+    
     def content = """
     {
         "BundleUrl": "${siteArgs.bundleUrl}",
         "GatewayAddress": [
-            "${siteArgs.gatewayAddress}"
+            "${gatewayAddress}"
         ],
         "LoginServiceIds": [
             ${serverId}
