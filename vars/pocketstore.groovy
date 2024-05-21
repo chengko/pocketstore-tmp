@@ -264,7 +264,7 @@ def writeNginxConfig(siteArgs, gameCode) {
         if(service.ServiceType == 'Login' || service.ServiceType == 'Game') {
             def port = gameCode + service.ServiceIndex
             content += """
-                ${port} ${env}-${serviceName}-1:80;
+                ${port} ${env}-${serviceName}-1:${port};
             """
         }
     }
