@@ -172,6 +172,8 @@ def buildHttpDockerCompose(args) {
         ]
     }
     
+    writeNginxConfig(siteArgs, gameCode)
+
     writeYaml file: 'docker-compose.yml', data: dockerCompose, overwrite: true
     
 }
@@ -237,4 +239,50 @@ def writeToWeb(site, filename, content) {
 
     sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site'"
     sh "docker cp ${filename} hfs:$WEB_CONFIG_ROOT/$site/."
+}
+
+def writeNginxConfig(siteArgs, gameCode) {
+
+    def env = siteArgs.site.toLowerCase()
+
+    def content = """
+    server {
+        listen 80;
+        server_name _;
+
+        resolver 127.0.0.11 valid=30s;
+
+        location /${env} {
+            rewrite ^/${env}(/.*)$ \$1 break;
+
+            map \$http_x_target \$upstream_backend {
+    """
+
+    siteArgs.services.each { serviceName, service ->
+        def port = gameCode + service.ServiceIndex
+        mapContent += """
+                ${port} ${env}-${serviceName}-1:80;
+        """
+    }
+
+    content += """
+                default "";
+            }
+
+            if (\$upstream_backend = "") {
+                return 404;
+            }
+
+            proxy_pass http://\$upstream_backend;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+    }
+    """
+
+    content = content.stripIndent()
+
+    writeFile file: "/data/nginx/conf/${env}.conf", text: content
 }
