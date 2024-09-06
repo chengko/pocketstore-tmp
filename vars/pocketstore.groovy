@@ -20,7 +20,7 @@ def selectSite(buildSetting, privateSite) {
             def content = """
             {
                 "SkipWebConfig": false,
-                "WebConfigIndexFileUrl": "https://cdn.pocket-store.make-wish.club/PS/WebConfig/${privateSite}/IndexFile.json",
+                "WebConfigIndexFileUrl": "https://cdn.pocket-store.make-wish.club/PS_Lupin/WebConfig/${privateSite}/IndexFile.json",
                 "LocalSite": "Private_${privateSite}"
             }
             """
