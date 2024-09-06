@@ -246,7 +246,7 @@ def writeToWeb(site, filename, content) {
 
     def settings = projects.loadSettings 'pocketstore'
 				    
-    s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: "csp-web-bundle-bucket/PS/WebConfig/${siteArgs.site}", excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: "${settings.S3.Region}", showDirectlyInBrowser: true, sourceFile: "${filename}", storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: "${settings.S3.Key}", userMetadata: [] 
+    s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: "csp-web-bundle-bucket/PS/WebConfig/${site}", excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: "${settings.S3.Region}", showDirectlyInBrowser: true, sourceFile: "${filename}", storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: "${settings.S3.Key}", userMetadata: [] 
 }
 
 def writeNginxConfig(siteArgs, gameCode) {
