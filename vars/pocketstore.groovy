@@ -15,10 +15,12 @@ def selectSite(buildSetting, privateSite) {
             result.File = "${destDir}/${privateSite}.json"
             result.Site = privateSite
 
+            def settings = projects.loadSettings 'pocketstore'
+
             def content = """
             {
                 "SkipWebConfig": false,
-                "WebConfigIndexFileUrl": "http://dev.make-wish.club/pocketstore_web_config/${privateSite}/IndexFile.json",
+                "WebConfigIndexFileUrl": "https://cdn.pocket-store.make-wish.club/PS/WebConfig/${privateSite}/IndexFile.json",
                 "LocalSite": "Private_${privateSite}"
             }
             """
@@ -189,7 +191,7 @@ def configureSite(args) {
     writeIndexFile(siteArgs)
     writeSite(siteArgs, gameCode + 1)
 
-    def url = "http://dev.make-wish.club/pocketstore_web_config/${siteArgs.site}/IndexFile.json"
+    def url = "https://cdn.pocket-store.make-wish.club/PS/WebConfig/${siteArgs.site}/IndexFile.json"
 
     currentBuild.description = "<a href='${url}'>${url}</a>"
 }
@@ -198,7 +200,7 @@ def writeIndexFile(siteArgs) {
 
     def content = """
     {
-        "BaseUrl": "http://dev.make-wish.club/pocketstore_web_config/",
+        "BaseUrl": "https://cdn.pocket-store.make-wish.club/PS/WebConfig/",
         "Files": [
             "CommonConfig.json",
             "Announcement.json",
@@ -241,6 +243,10 @@ def writeToWeb(site, filename, content) {
 
     sh "docker exec hfs sh -c 'mkdir -p $WEB_CONFIG_ROOT/$site'"
     sh "docker cp ${filename} hfs:$WEB_CONFIG_ROOT/$site/."
+
+    def settings = projects.loadSettings 'pocketstore'
+				    
+    s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: "csp-web-bundle-bucket/PS/WebConfig/${siteArgs.site}", excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: "${settings.S3.Region}", showDirectlyInBrowser: true, sourceFile: "${filename}", storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: "${settings.S3.Key}", userMetadata: [] 
 }
 
 def writeNginxConfig(siteArgs, gameCode) {
