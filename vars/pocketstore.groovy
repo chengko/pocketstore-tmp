@@ -20,7 +20,7 @@ def selectSite(buildSetting, privateSite) {
             def content = """
             {
                 "SkipWebConfig": false,
-                "WebConfigIndexFileUrl": "https://cdn.pocket-store.make-wish.club/PS_Lupin/WebConfig/${privateSite}/IndexFile.json",
+                "WebConfigIndexFileUrl": "https://pocketstore-artifacts.s3.amazonaws.com/WebConfig/${privateSite}/IndexFile.json",
                 "LocalSite": "Private_${privateSite}"
             }
             """
@@ -191,7 +191,7 @@ def configureSite(args) {
     writeIndexFile(siteArgs)
     writeSite(siteArgs, gameCode + 1)
 
-    def url = "https://cdn.pocket-store.make-wish.club/PS_Lupin/WebConfig/${siteArgs.site}/IndexFile.json"
+    def url = "https://pocketstore-artifacts.s3.amazonaws.com/WebConfig/${siteArgs.site}/IndexFile.json"
 
     currentBuild.description = "<a href='${url}'>${url}</a>"
 }
@@ -200,7 +200,7 @@ def writeIndexFile(siteArgs) {
 
     def content = """
     {
-        "BaseUrl": "https://cdn.pocket-store.make-wish.club/PS/WebConfig/",
+        "BaseUrl": "https://pocketstore-artifacts.s3.amazonaws.com/WebConfig/",
         "Files": [
             "CommonConfig.json",
             "Announcement.json",
@@ -246,7 +246,7 @@ def writeToWeb(site, filename, content) {
 
     def settings = projects.loadSettings 'pocketstore'
 				    
-    s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: "csp-web-bundle-bucket/PS_Lupin/WebConfig/${site}", excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: 'ap-southeast-1', showDirectlyInBrowser: true, sourceFile: "${filename}", storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: "${settings.S3.Key}", userMetadata: [] 
+    s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: "${settings.S3.Bucket}/WebConfig/${site}", excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: "${settings.S3.Region}", showDirectlyInBrowser: true, sourceFile: "${filename}", storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: "${settings.S3.Key}", userMetadata: [] 
 }
 
 def writeNginxConfig(siteArgs, gameCode) {
