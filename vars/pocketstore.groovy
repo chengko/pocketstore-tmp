@@ -61,7 +61,7 @@ def buildDockerCompose(args) {
         globalSettings = siteArgs.template
     }
 
-    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/GenerateGlobalSetting', selector: lastSuccessful()
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
     for(i = 1; i <=siteArgs.sharding; i++) {
@@ -138,7 +138,7 @@ def buildHttpDockerCompose(args) {
         globalSettings = siteArgs.template
     }
 
-    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    copyArtifacts parameters: "Name=${globalSettings}", projectName: 'PocketStore/GenerateGlobalSetting', selector: lastSuccessful()
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
     for(i = 1; i <=siteArgs.sharding; i++) {
@@ -184,7 +184,7 @@ def configureSite(args) {
 
     def siteArgs = new ConfigureSiteArgs(args)
 
-    copyArtifacts parameters: "Name=${siteArgs.site}", projectName: 'PocketStore/Generate GlobalSetting', selector: lastSuccessful()
+    copyArtifacts parameters: "Name=${siteArgs.site}", projectName: 'PocketStore/GenerateGlobalSetting', selector: lastSuccessful()
     def gameCode = sh(script: "jq -r '.GameCode' GlobalSettings.json", returnStdout:true).trim().toInteger()
 
     
